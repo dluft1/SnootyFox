@@ -1,0 +1,17 @@
+th {
+    text-align: left;
+    padding-bottom: 5px;
+    border-bottom: 1px solid gray;
+}
+
+td {
+    padding: 5px 0px 5px 5px;
+}
+
+table {
+    margin-top: 10px;
+}
+
+#itemQuantityCell {
+    text-align: center;
+}

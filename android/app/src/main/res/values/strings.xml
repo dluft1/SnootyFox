@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">SnootyApp</string>
+    <string name="title_activity_main">SnootyApp</string>
+    <string name="package_name">com.snooty.app</string>
+    <string name="custom_url_scheme">com.snooty.app</string>
+</resources>

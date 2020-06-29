@@ -1,0 +1,138 @@
+.horizontalScroll {
+    --overflow: hiddden;
+    overflow: scroll;
+    white-space: nowrap;
+}
+
+.itemSize {
+    font-size: .9em;
+    overflow-x: auto;
+    display: inline-block;
+    white-space: nowrap;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+.fullScreen {
+    height: 100%;
+}
+
+.removeDefaults {
+    border: none;
+}
+
+.menuItems {
+    width: 100%;
+}
+
+.menuItemStyle {
+    vertical-align: top;
+    font-size: .75em;
+    padding-top: 5px;
+    padding-left: 10px;
+}
+
+.menuItemStyle h5 {
+    font-size: 1.4em;
+    float: left;
+    width: 75%;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
+#menuItemSlide {
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+#menuItemPrice {
+    width: 20%;
+    float: right;
+}
+
+#menuItemDescription {
+    display: inline-block;
+}
+
+.menuItemCardFrame {
+    --overflow: hiddden;
+    overflow: scroll;
+    white-space: nowrap;
+
+    display: none;
+    width: 100%;
+    height: 150%;
+    position: fixed;
+    left: 0px;
+    top: 100px;
+    background-color: black;
+}
+
+.closeIcon {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+
+#buttonPadding {
+    margin-right: 15px;
+    margin-left: 15px;
+}
+
+.imgFit {
+    width: 100px;
+    height: 100px;
+}
+
+.menuListStyle {
+    padding-left: 20px;
+    vertical-align: top;
+    width: 72.5%;
+}
+
+table {
+    width: 100%;
+}
+
+.orderButtons {
+    margin-left: auto;
+    margin-right: auto;
+    width: 39%;
+}
+
+#menuButton {
+    border: 2px solid green;
+    float: left;
+}
+
+#appHeader {
+
+    float: right;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main {
+    float: left;
+}
+
+.menuItemsList {
+    padding-top: 5px;
+}
+
+#menuItemObject {
+    border: 2px solid red;
+}
+
+body {
+    background-color: black;
+    color: white;
+}
+
+
+
