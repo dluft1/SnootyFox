@@ -26,28 +26,19 @@ import * as $ from 'jquery';
 import './theme/variables.css';
 import ShoppingCart from "./pages/Cart.js";
 import AccountPage from "./pages/Account.js";
+import { runInThisContext } from 'vm';
 
 
 /**  
  * 
  * TODO: 
  * 
- *  1) Change global variables to state of AppWindow
- *  2) Change 'Starters' to MenuDisplay to process entire menu
- *      - Remove routing for old individual menu sections
- *      - Make menuDisplay call for data from database depending on menu section viewed
- *      - Move MenuDisplay to own file and import
- *   3) Remove obsolete variables used for testing / old designs  
+ *  - Move Menu to own file and import
+ *  - Remove obsolete variables used for testing / old designs
+ *  - Optimize for tablet
+ *  - Enter rest of menu database  
  *  
  */
-
-var activeOrder = [];
-var Status = new Object();
-Status.loggedIn = "false";
-Status.account = "";
-var menuItem = {};
-
-
 
 const App = React.FC = () => (
   <IonApp>
@@ -56,7 +47,6 @@ const App = React.FC = () => (
     </IonContent>
   </IonApp>
 );
-
 
 // Main APP Window, displays header
 class AppWindow extends React.Component {
@@ -68,13 +58,15 @@ class AppWindow extends React.Component {
       ordered: [],
       view: "menu",
       loggedIn: "false",
-      account: ""
+      account: "",
+      menuItem: {},
+      activeOrder: []
     };
   }
   render() {
     return (
       <div>
-        <Header addToCart={this.addToCart.bind(this)} changeView={this.changeView.bind(this)} cart={this.state.cart} loggedIn={this.state.loggedIn} changeLoggedIn={this.changeLoggedIn.bind(this)} account={this.state.account} />
+        <Header addToCart={this.addToCart.bind(this)} changeView={this.changeView.bind(this)} cart={this.state.cart} loggedIn={this.state.loggedIn} changeLoggedIn={this.changeLoggedIn.bind(this)} account={this.state.account}/>
       </div>
     )
   }
@@ -83,10 +75,9 @@ class AppWindow extends React.Component {
     this.setState({ loggedIn: status });
   }
 
-  addToCart() {
+  addToCart(selectedItem) {
     if (this.state.loggedIn == "true") {
-      this.setState({ cart: activeOrder });
-      console.log(this.state.cart);
+      this.setState({ cart: [selectedItem] });
     }
     else {
       alert("Please login");
@@ -96,12 +87,10 @@ class AppWindow extends React.Component {
   changeView(view) {
     if (view == "account" || view == "cart" && this.state.view == "menu") {
       this.setState({ view: view })
-      console.log("Trying to change the view");
       $(".horizontalScroll").hide();
     }
     else if (view == "menu" && this.state.view == "cart" || this.state.view == "account") {
       this.setState({ view: view })
-      console.log("Trying to reshow menu submenu");
       $(".horizontalScroll").show();
     }
   }
@@ -125,12 +114,12 @@ class Header extends React.Component {
         <IonMenu side="start" menuId="first" content-id="main" width="50">
           <IonHeader>
             <IonToolbar>
-              <IonTitle>MenuTest</IonTitle>
+              <IonTitle>Menu</IonTitle>
             </IonToolbar>
           </IonHeader>
           <IonContent>
             <IonList>
-              <NavLink to="/" onClick={() => this.props.changeView("menu")}><IonItem>Sections</IonItem></NavLink>
+              <NavLink to="/" onClick={() => this.props.changeView("menu")}><IonItem>Home</IonItem></NavLink>
               <NavLink to="/starters" onClick={() => this.props.changeView("menu")}><IonItem>Starters</IonItem></NavLink>
               <NavLink to="/fries" onClick={() => this.props.changeView("menu")}><IonItem>Fries</IonItem></NavLink>
               <NavLink to="/wings" onClick={() => this.props.changeView("menu")}><IonItem>Wings</IonItem></NavLink>
@@ -173,12 +162,12 @@ class Header extends React.Component {
             </div>
           </IonToolbar>
           <Route exact path="/" component={withRouter(Main)} />
-          <Route path="/starters" render={props => (<Starters addToCart={this.props.addToCart.bind(this)} />)} />
-          <Route path="/fries" render={props => (<Fries addToCart={this.props.addToCart.bind(this)} />)} />
-          <Route path="/wings" render={props => (<Wings addToCart={this.props.addToCart.bind(this)} />)} />
-          <Route path="/burgers" render={props => (<Burgers addToCart={this.props.addToCart.bind(this)} />)} />
-          <Route path="/common" render={props => (<Common addToCart={this.props.addToCart.bind(this)} />)} />
-          <Route path="/beverages" render={props => (<Beverages addToCart={this.props.addToCart.bind(this)} />)} />
+          <Route path="/starters" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"starters"}/>)} />
+          <Route path="/fries" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"fries"} />)} />
+          <Route path="/wings" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"wings"}/>)} />
+          <Route path="/burgers" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"burgers"} />)} />
+          <Route path="/common" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"common"}/>)} />
+          <Route path="/beverages" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"beverages"} />)} />
           <Route path="/account" render={props => (<AccountPage changeLoggedIn={this.props.changeLoggedIn.bind(this) } loggedIn={this.props.loggedIn}  />)} />
           <Route path="/cart" render={props => (<ShoppingCart cart={this.props.cart} loggedIn={this.props.loggedIn} />)} />
         </IonHeader>
@@ -228,15 +217,13 @@ class MenuItemCard extends React.Component {
   addToOrder(name, price, quantity) {
     // $.post('http://dariusluft.ca/snootyfox/index.php', { action: 'addToOrder', item: name, price: price, quantity: quantity }, function (response) 
  
-    menuItem = { name: name, price: price, quantity: quantity }
-    activeOrder.push(menuItem);
-    this.props.addToCart();
+    var selectedItem = { name: name, price: price, quantity: quantity };
+    this.props.addToCart(selectedItem);
     this.toggleMenuCardOff();
   }
 
   // Diplay the menu item Card
   render() {
-    console.log(this.props.image);
     return (
       <div className="menuItemCardFrame">
         <IonCard className="menuItemCard">
@@ -260,11 +247,11 @@ class MenuItemCard extends React.Component {
   }
 }
 
-class Starters extends React.Component {
+class Menu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      startersData: [],
+      menuData: [],
       name: "",
       price: "",
       description: "",
@@ -294,11 +281,11 @@ class Starters extends React.Component {
   }
 
   componentDidMount() {
-    console.log("We got in here");
     let currentComponent = this;
-    $.post('http://24.141.109.234:8080/snootyfox/index.php', { action: 'menu', section: 'starters' }, function (response) {
+    // $.post('http://dariusluft.ca/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response)
+    $.post('http://24.141.109.234:8080/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response) {
       let temp = JSON.parse(response);
-      currentComponent.setState({ startersData: temp })
+      currentComponent.setState({ menuData: temp })
     })
   }
   render() {
@@ -308,46 +295,11 @@ class Starters extends React.Component {
 
       <div className="menuItemsList">
         <table >
-          <tbody>{currentComponent.state.startersData.map(currentComponent.menuTableData.bind(currentComponent))}</tbody>
+          <tbody>{currentComponent.state.menuData.map(currentComponent.menuTableData.bind(currentComponent))}</tbody>
         </table>
         <MenuItemCard name={this.state.name} price={this.state.price} description={this.state.description} image={this.state.image} addToCart={this.props.addToCart.bind(this)} />
       </div>
     )
-  }
-}
-
-class Fries extends React.Component {
-
-  render() {
-    return (
-      <div>
-        sadf
-      </div>
-    )
-  }
-}
-class Wings extends React.Component {
-  render() {
-    return (
-      <div>sadf</div>)
-  }
-}
-class Burgers extends React.Component {
-  render() {
-    return (
-      <div>sadf</div>)
-  }
-}
-class Common extends React.Component {
-  render() {
-    return (
-      <div>sadf</div>)
-  }
-}
-class Beverages extends React.Component {
-  render() {
-    return (
-      <div>sadf</div>)
   }
 }
 
@@ -358,44 +310,56 @@ class Main extends React.Component {
         <IonGrid >
           <IonRow >
             <IonCol >
+            <NavLink to="/starters">
               <div className="ion-activatable ripple-parent" >
                 <img src="assets/images/sections/starters-300x300.webp" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
             <IonCol>
+            <NavLink to="/fries">
               <div className="ion-activatable ripple-parent">
                 <img src="assets/images/sections/fries-poutine-1-300x300.jpg" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
           </IonRow>
           <IonRow>
             <IonCol>
+            <NavLink to="/wings">
               <div className="ion-activatable ripple-parent">
                 <img src="assets/images/sections/wings-300x300.jpg" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
             <IonCol>
+            <NavLink to="/burgers">
               <div className="ion-activatable ripple-parent">
                 <img src="assets/images/sections/burger-300x300.webp" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
           </IonRow>
           <IonRow>
             <IonCol>
+            <NavLink to="/common">
               <div className="ion-activatable ripple-parent">
                 <img src="assets/images/sections/common-300x300.jpg" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
             <IonCol>
+            <NavLink to="/beverages">
               <div className="ion-activatable ripple-parent">
                 <img src="assets/images/sections/beverages-300x300.jpg" className="alignItemsCenter" alt="" />
                 <IonRippleEffect></IonRippleEffect>
               </div>
+              </NavLink>
             </IonCol>
           </IonRow>
         </IonGrid>

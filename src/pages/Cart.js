@@ -34,11 +34,11 @@ class ShoppingCart extends React.Component {
     }
 
     componentDidMount() {
+        console.log(this.props.cart);
         this.setState({ cartItems: this.props.cart })
     }
 
     render() {
-        console.log(this.props.cart);
         if (this.props.loggedIn == "true") {
             return (
                 <div>
