@@ -1,17 +1,67 @@
-th {
-    text-align: left;
-    padding-bottom: 5px;
-    border-bottom: 1px solid gray;
-}
 
 td {
     padding: 5px 0px 5px 5px;
 }
 
 table {
+    width: 100%;
     margin-top: 10px;
 }
 
-#itemQuantityCell {
-    text-align: center;
+.orderTable {
+    border-top: 2px solid darkgray;
+    margin-bottom: 12px;
+}
+
+
+.orderDiv {
+    padding-top: 20px;
+    margin-top: 12px;
+    width: 100%;
+    float: left;
+}
+
+.nameDiv {
+    float: left;
+}
+
+.priceDiv {
+    margin-right: 10px;
+    float: right;
+}
+
+.addonSlide {
+    padding-top: 12px;
+    width: 100%;
+    float: left;
+}
+
+.orderTD {
+    float: left;
+    width: 95%;
+    padding-left: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.priceSlide {
+    margin-right: 10px;
+    float: right;
+
+}
+
+tr {
+    float: left;
+    width: 100%;
+}
+
+.tableCode {
+    margin-left: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid darkgray;
+}
+h2 {
+    text-align: left;
 }

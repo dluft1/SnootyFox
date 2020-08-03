@@ -29,42 +29,53 @@ class ShoppingCart extends React.Component {
         super(props)
         this.state = {
             cartItems: [],
-            orderPlaced: []
+            orderPlaced: [],
+            total: 0
         }
+        this.addonTableData = this.addonTableData.bind(this);
     }
 
     componentDidMount() {
         console.log(this.props.cart);
-        this.setState({ cartItems: this.props.cart })
+        let tempOrder = this.props.cart;
+        let tempPrice = 0;
+        for (var i = 0; i < tempOrder.length; i++)
+        {
+            if (tempOrder[i].addons.length > 0)
+            {
+                for (var x = 0; x < tempOrder[i].addons.length; x++)
+                {
+                    tempPrice = parseFloat(tempPrice) + parseFloat(tempOrder[i].addons[x].price);
+                }
+            }
+            tempPrice = parseFloat(tempPrice) + parseFloat(tempOrder[i].price);
+        }
+        this.setState({ cartItems: this.props.cart, total: tempPrice })
+
     }
 
     render() {
-        if (this.props.loggedIn == "true") {
-            return (
-                <div>
-                    Shopping cart
-                    <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th></th>
-                        </tr>
-                        {this.state.cartItems.map(this.cartTableData.bind(this))}
-                    </table>
+        return (
+            <div>
+                <h2>Order Cart</h2>
+                <table className="orderTable">
+                    {this.state.cartItems.map(this.cartTableData.bind(this))}
+                    <div className="orderDiv">
+                    </div>
+                    <div className="nameDiv">Total: ${this.state.total}</div>
+                </table>
+                <div className="tableCode">
+                    Please enter your table code:
+                    <input type="text" size="20" /><br />
                     <IonButton onClick={() => this.placeOrder()} >Place Order</IonButton>
-                    <table>
-                        {this.state.orderPlaced.map(this.cartTableData.bind(this))}
-                    </table>
                 </div>
-            )
-        }
-        else {
-            return (
-                <div>Please login</div>
-            )
-        }
+                <table>
+                    {this.state.orderPlaced.map(this.cartTableData.bind(this))}
+                </table>
+            </div>
+        )
     }
+
 
     placeOrder() {
         //place the order
@@ -72,18 +83,32 @@ class ShoppingCart extends React.Component {
         console.log("Placed order: ", this.state.orderPlaced);
     }
 
-    cartTableData({ name, price, quantity }) {
+    addonTableData({ name, price }) {
         return (
-            <tr key={name} className="cartItemSlide">
-                <td>{name}</td>
-                <td>{price}</td>
-                <td id="itemQuantityCell">{quantity}</td>
-                <td>X</td>
-            </tr>
+            <div class="addonSlide">
+                <tr key={name}>
+                    <td className="orderTD">Add {name} <div className="priceSlide">${price}</div></td>
+                </tr>
+            </div>
         )
     }
 
-    
+    cartTableData({ name, price, quantity, addons }) {
+        console.log(this.state.cartItems);
+        console.log(this.state.cartItems[0].addons);
+        return (
+            <div className="orderDiv">
+                <tr key={name}>
+                    <div className="nameDiv">{name} x {quantity}
+                    </div>
+                    <div className="priceDiv">${price}</div>
+                    {addons.map(this.addonTableData.bind(this))}
+                </tr>
+            </div>
+        )
+    }
+
+
 }
 
 export default ShoppingCart;
