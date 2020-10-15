@@ -36,21 +36,26 @@ class ShoppingCart extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.props.cart);
         let tempOrder = this.props.cart;
         let tempPrice = 0;
-        for (var i = 0; i < tempOrder.length; i++)
-        {
-            if (tempOrder[i].addons.length > 0)
-            {
-                for (var x = 0; x < tempOrder[i].addons.length; x++)
-                {
+        for (var i = 0; i < tempOrder.length; i++) {
+            // sum total of addons
+            if (tempOrder[i].addons.length > 0) {
+                for (var x = 0; x < tempOrder[i].addons.length; x++) {
                     tempPrice = parseFloat(tempPrice) + parseFloat(tempOrder[i].addons[x].price);
                 }
             }
+            // sum total of sides if required
+            if (tempOrder[i].sides.length > 0) {
+                for (let x = 0; x < tempOrder[i].sides.length; x++) {
+                    tempPrice = parseFloat(tempPrice) + parseFloat(tempOrder[i].sides[x].price);
+                }
+            }
+
             tempPrice = parseFloat(tempPrice) + parseFloat(tempOrder[i].price);
         }
         this.setState({ cartItems: this.props.cart, total: tempPrice })
+        console.log(this.props.cart);
 
     }
 
@@ -72,6 +77,7 @@ class ShoppingCart extends React.Component {
                 <table>
                     {this.state.orderPlaced.map(this.cartTableData.bind(this))}
                 </table>
+                <IonButton onClick={() => alert("Payment currently disabled")} color="warning">Checkout</IonButton>
             </div>
         )
     }
@@ -93,15 +99,36 @@ class ShoppingCart extends React.Component {
         )
     }
 
-    cartTableData({ name, price, quantity, addons }) {
+    sideTableData({ name, price, dressing }) {
+        return (
+            <div class="addonSlide">
+                <tr key={name}>
+                    <td className="orderTD">{name} <div className="priceSlide">${price}</div></td>
+                    {dressing.map(this.dressingTableData)}
+                </tr>
+            </div>
+        )
+    }
+
+    dressingTableData({name}) {
+        return (
+            <div class="addonSlide">
+                <tr key={name}>
+                    <td className="orderTD">{name}</td>
+                </tr>
+            </div>
+        )
+    }
+
+    cartTableData({ name, price, quantity, addons, sides }) {
         console.log(this.state.cartItems);
-        console.log(this.state.cartItems[0].addons);
         return (
             <div className="orderDiv">
                 <tr key={name}>
                     <div className="nameDiv">{name} x {quantity}
                     </div>
                     <div className="priceDiv">${price}</div>
+                    {sides.map(this.sideTableData.bind(this))}
                     {addons.map(this.addonTableData.bind(this))}
                 </tr>
             </div>

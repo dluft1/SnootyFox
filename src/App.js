@@ -40,7 +40,7 @@ import { runInThisContext } from 'vm';
  *  - Complete Placed order handler
  *  - Create 'tablecode' code for ordering (php and js)
  *  - Finish addon group support
- *  - remove some spaghetti
+ *  - remove some spaghetti 
  *  
  */
 
@@ -78,8 +78,8 @@ class AppWindow extends React.Component {
     )
   }
 
-  showMenuItemCard(activeCard, name, price, description, image, addons) {
-    let temp = { "name": name, "price": price, "description": description, "image": image, "addons": addons };
+  showMenuItemCard(activeCard, name, price, description, image, addons, sideslist) {
+    let temp = { "name": name, "price": price, "description": description, "image": image, "addons": addons, "sides": sideslist };
     console.log(temp);
     this.setState({ activeView: activeCard, selectedItem: temp });
   }
@@ -94,7 +94,6 @@ class AppWindow extends React.Component {
   }
 
   addToCart(selectedItem) {
-    console.log("We got in here");
     let tempCart = this.state.cart;
     tempCart.push(selectedItem);
     this.setState({ cart: tempCart, activeView: 1 });
@@ -181,7 +180,7 @@ class Header extends React.Component {
 
           <IonHeader>
             <IonItem lines="none">
-              <IonMenuButton id="main" /> <h2 id="appHeader">The SnootyFox Menu App</h2>
+              <IonMenuButton id="main" /> <h2 id="appHeader">The SnootyFox</h2>
             </IonItem>
             <IonToolbar>
               <div className="horizontalScroll">
@@ -210,11 +209,11 @@ class Header extends React.Component {
             </IonToolbar>
             <Route exact path="/" component={withRouter(Main)} />
             <Route path="/starters" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"starters"} showMenuItemCard={this.props.showMenuItemCard.bind(this)} />)} />
-            <Route path="/fries" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"fries"} />)} />
-            <Route path="/wings" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"wings"} />)} />
-            <Route path="/burgers" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"burgers"} />)} />
-            <Route path="/common" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"common"} />)} />
-            <Route path="/beverages" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"beverages"} />)} />
+            <Route path="/fries" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"fries"}  showMenuItemCard={this.props.showMenuItemCard.bind(this)} /> )} />
+            <Route path="/wings" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"wings"} showMenuItemCard={this.props.showMenuItemCard.bind(this)}/>)} />
+            <Route path="/burgers" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"burger"} showMenuItemCard={this.props.showMenuItemCard.bind(this)}/>)} />
+            <Route path="/common" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"common"} showMenuItemCard={this.props.showMenuItemCard.bind(this)} />)} />
+            <Route path="/beverages" render={props => (<Menu addToCart={this.props.addToCart.bind(this)} menuSection={"beverages"} showMenuItemCard={this.props.showMenuItemCard.bind(this)} />)} />
             <Route path="/account" render={props => (<AccountPage changeLoggedIn={this.props.changeLoggedIn.bind(this)} loggedIn={this.props.loggedIn} />)} />
             <Route path="/cart" render={props => (<ShoppingCart cart={this.props.cart} loggedIn={this.props.loggedIn} />)} />
           </IonHeader>
@@ -236,9 +235,9 @@ class Menu extends React.Component {
     }
   }
 
-  menuTableData({ name, description, price, image, id, addonlist }) {
+  menuTableData({ name, description, price, image, id, addonlist, sidelist }) {
     return (
-      <tr key={id} id="menuItemSlide" onClick={() => this.props.showMenuItemCard("2", name, price, description, image, addonlist)}>
+      <tr key={id} id="menuItemSlide" onClick={() => this.props.showMenuItemCard("2", name, price, description, image, addonlist, sidelist)}>
         <td><img src={image} className="imgFit" alt="" /></td>
         <td className="menuListStyle">
           <h5>{name}</h5>
@@ -251,11 +250,10 @@ class Menu extends React.Component {
 
   componentDidMount() {
     let currentComponent = this;
-    // $.post('http://dariusluft.ca/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response)
-    $.post('http://24.141.109.234:8080/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response) {
+     $.post('http://dariusluft.ca/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response) {
+    //$.post('http://24.141.109.234:8080/snootyfox/index.php', { action: 'menu', section: this.props.menuSection }, function (response) {
       let temp = JSON.parse(response);
       currentComponent.setState({ menuData: temp })
-      console.log(temp);
     })
   }
   render() {
